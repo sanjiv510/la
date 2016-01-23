@@ -26,12 +26,13 @@ class Vector(object):
         return self.coordinates == v.coordinates
     
     def orthogonal_to_base(self, base):
-        theta = self.angle_in_rad(base)
-        return self.times_scalar(sin(theta))
+        projection = self.parallel_to_base(base)
+        return self.minus(projection)
 
     def parallel_to_base(self, base):
-        theta = self.angle_in_rad(base)
-        return self.times_scalar(cos(theta))
+        base_unit  = base.normalized()
+        mag_parallel = self.dot_product(base_unit)
+        return base_unit.times_scalar(mag_parallel)
 
     def is_orthogonal_to(self, v, tolerance=1e-10):
         return abs(self.dot_product(v))< tolerance
