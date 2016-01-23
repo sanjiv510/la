@@ -1,6 +1,6 @@
 #! /usr/bin/python -tt
 
-from math import sqrt, acos, degrees, pi
+from math import sqrt, acos, degrees, pi, sin, cos
 from decimal import Decimal, getcontext
 
 getcontext().prec = 30
@@ -25,6 +25,14 @@ class Vector(object):
     def __eq__(self, v):
         return self.coordinates == v.coordinates
     
+    def orthogonal_to_base(self, base):
+        theta = self.angle_in_rad(base)
+        return self.times_scalar(sin(theta))
+
+    def parallel_to_base(self, base):
+        theta = self.angle_in_rad(base)
+        return self.times_scalar(cos(theta))
+
     def is_orthogonal_to(self, v, tolerance=1e-10):
         return abs(self.dot_product(v))< tolerance
 
@@ -67,7 +75,7 @@ class Vector(object):
 
 
     def times_scalar(self, c):
-        new_coordinates = [x*c for x in self.coordinates]
+        new_coordinates = [x*Decimal(c) for x in self.coordinates]
         return Vector(new_coordinates)
 
     def magnitude(self):
