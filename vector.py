@@ -25,6 +25,19 @@ class Vector(object):
     def __eq__(self, v):
         return self.coordinates == v.coordinates
     
+    def cross_product(self, w):
+        x = self.coordinates
+        y = w.coordinates
+        new_coordinates = [x[1]*y[2] - x[2]*y[1], -(x[0]*y[2] - x[2]*y[0]), x[0]*y[1] - x[1]*y[0]]
+        return Vector(new_coordinates)
+
+    def area_parallogram(self, v):
+        x_product = self.cross_product(v)
+        return x_product.magnitude()
+
+    def area_trangle(self, v):
+        return self.area_parallogram(v)/Decimal('2.0')
+
     def orthogonal_to_base(self, base):
         projection = self.parallel_to_base(base)
         return self.minus(projection)
