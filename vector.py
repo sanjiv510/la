@@ -1,6 +1,7 @@
 #! /usr/bin/python -tt
 
-from math import sqrt, acos, degrees, pi, sin, cos
+from math import degrees, pi, sqrt, acos, sin, cos
+#from cmath import sqrt, acos, sin, cos
 from decimal import Decimal, getcontext
 
 getcontext().prec = 30
@@ -29,8 +30,15 @@ class Vector(object):
         return self.coordinates == v.coordinates
     
     def cross(self, w):
-        x = self.coordinates
-        y = w.coordinates
+        
+        if self.dimension<3:
+            x = Vector(self.coordinates+('0',)).coordinates
+            y = Vector(w.coordinates+('0',)).coordinates
+        else:
+            x = self.coordinates
+            y = w.coordinates
+        
+        
         new_coordinates = [x[1]*y[2] - x[2]*y[1], -(x[0]*y[2] - x[2]*y[0]), x[0]*y[1] - x[1]*y[0]]
         return Vector(new_coordinates)
 
@@ -38,7 +46,7 @@ class Vector(object):
         x_product = self.cross(v)
         return x_product.magnitude()
 
-    def area_trangle(self, v):
+    def area_tringle(self, v):
         return self.area_parallogram(v)/Decimal('2.0')
 
     def component_orthogonal_to(self, basis):
@@ -74,7 +82,7 @@ class Vector(object):
             dot = self.dot(v)
             magnitude_product = self.magnitude()*v.magnitude()
             try:
-                return acos(dot/magnitude_product)
+                return acos(round(dot/magnitude_product,10))
             except Exception as e:
                 if str(e) == self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG:
                     raise Exception('Cannot compute an angle with the zero vector')
@@ -99,12 +107,13 @@ class Vector(object):
         return Vector(new_coordinates)
 
     def magnitude(self):
-        coordinates_squared = [x**2 for x in self.coordinates]
-        return sqrt(sum(coordinates_squared))
+        coordinates_squared = [Decimal(x**2) for x in self.coordinates]
+        x = sqrt(sum(coordinates_squared))
+        return Decimal(x)
 
     def normalized(self):
         try:
             magnitude = self.magnitude()
-            return self.times_scalar(1.0/magnitude)
+            return self.times_scalar(Decimal(1.0)/magnitude)
         except ZeroDivisionError:
             raise Exception(self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG)

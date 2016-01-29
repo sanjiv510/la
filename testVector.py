@@ -2,6 +2,55 @@
 from  vector import Vector 
 
 
+
+v = Vector([8.462,7.893, -8.187])
+w = Vector([6.984, -5.975, 4.778])
+
+print "v.cross(w): ", v.cross(w)
+print " area_parallogram: ", v.area_parallogram(w)
+print " area_tringle: ", v.area_tringle(w)
+
+
+v = Vector([8.462,7.893])
+w = Vector([6.984, -5.975])
+
+print "v.cross(w): ", v.cross(w)
+exit(0)
+
+v1= Vector([3.009, -6.172, 3.629, -2.51])
+b1 = Vector([6.404, -9.144, 2.759, 8.718])
+
+print " v|| + V per", v1.component_parallel_to(b1), v1.component_orthogonal_to(b1)
+vpar = v1.component_parallel_to(b1)
+vort =  v1.component_orthogonal_to(b1)
+
+print "vpar + vort: ", vpar.plus(vort)
+
+exit(0)
+
+
+
+# Checking for parallelism & orthogonality
+v = Vector([-7.579, -7.88])
+w = Vector([22.737, 23.64])
+print "v.w: ", type(v.dot(w))
+print "v..magnitude: ", type(v.magnitude())
+print "v.w / v.mag: ", v.dot(w)/w.magnitude()
+
+
+
+
+
+print "v is parallel to w: ", v.is_parallel_to(w)
+print "v is orthogonal to w: ", v.is_orthogonal_to(w)
+exit(0)
+
+v1 = Vector([7.887, 4.138])
+w1 = Vector([-8.802, 6.776])
+print "v . w: ", v1.dot(w1)
+exit(0)
+
+
 v1= Vector([3.009, -6.172, 3.629, -2.51])
 b1 = Vector([6.404, -9.144, 2.759, 8.718])
 
