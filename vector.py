@@ -6,6 +6,8 @@ from decimal import Decimal, getcontext
 getcontext().prec = 30
 
 class Vector(object):
+    CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'Cannot normalize zero vector'
+
     def __init__(self, coordinates):
         try:
             if not coordinates:
@@ -20,41 +22,42 @@ class Vector(object):
             raise TypeError('The coordinates must be an iterable')
 
     def __str__(self):
-        return 'Vector: {}'.format(self.coordinates)
+        a_tuple = tuple(["{:.3f}".format(n) for n in self.coordinates])
+        return 'Vector: {}'.format(a_tuple)
 
     def __eq__(self, v):
         return self.coordinates == v.coordinates
     
-    def cross_product(self, w):
+    def cross(self, w):
         x = self.coordinates
         y = w.coordinates
         new_coordinates = [x[1]*y[2] - x[2]*y[1], -(x[0]*y[2] - x[2]*y[0]), x[0]*y[1] - x[1]*y[0]]
         return Vector(new_coordinates)
 
     def area_parallogram(self, v):
-        x_product = self.cross_product(v)
+        x_product = self.cross(v)
         return x_product.magnitude()
 
     def area_trangle(self, v):
         return self.area_parallogram(v)/Decimal('2.0')
 
-    def orthogonal_to_base(self, base):
-        projection = self.parallel_to_base(base)
+    def component_orthogonal_to(self, basis):
+        projection = self.component_parallel_to(basis)
         return self.minus(projection)
 
-    def parallel_to_base(self, base):
-        base_unit  = base.normalized()
-        mag_parallel = self.dot_product(base_unit)
-        return base_unit.times_scalar(mag_parallel)
+    def component_parallel_to(self, basis):
+        basis_unit  = basis.normalized()
+        mag_parallel = self.dot(basis_unit)
+        return basis_unit.times_scalar(mag_parallel)
 
     def is_orthogonal_to(self, v, tolerance=1e-10):
-        return abs(self.dot_product(v))< tolerance
+        return abs(self.dot(v))< tolerance
 
     def is_parallel_to(self, v):
         return ( self.is_zero() or
                 v.is_zero() or
-                self.angle_in_rad(v) == 0 or
-                self.angle_in_rad(v) == pi)
+                self.angle_with_rad(v) == 0 or
+                self.angle_with_rad(v) == pi)
     # def is_parallel_to(self, v):
     #      self_normal = self.normalized()
     #      v_normal = v.normalized()
@@ -63,20 +66,23 @@ class Vector(object):
     def is_zero(self, tolerance=1e-10):
         return self.magnitude() < tolerance
 
-    def dot_product(self,v):
+    def dot(self,v):
         new_coordinates = [x*y for x, y in zip(self.coordinates, v.coordinates) ]
         return sum(new_coordinates)
     
-    def angle_in_rad(self,v):
-            dot_product = self.dot_product(v)
+    def angle_with_rad(self,v):
+            dot = self.dot(v)
             magnitude_product = self.magnitude()*v.magnitude()
             try:
-                return acos(dot_product/magnitude_product)
-            except ZeroDivisionError:
-                raise 'One of the magnitude is zero, to get angle both vector magnitude should be greter than zero'
+                return acos(dot/magnitude_product)
+            except Exception as e:
+                if str(e) == self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG:
+                    raise Exception('Cannot compute an angle with the zero vector')
+                else:
+                    raise e
     
-    def angle_in_deg(self, v):
-        rad = self.angle_in_rad(v)
+    def angle_with_deg(self, v):
+        rad = self.angle_with_rad(v)
         return degrees(rad)
 
     def plus(self, v):
@@ -94,11 +100,11 @@ class Vector(object):
 
     def magnitude(self):
         coordinates_squared = [x**2 for x in self.coordinates]
-        return Decimal(sqrt(sum(coordinates_squared)))
+        return sqrt(sum(coordinates_squared))
 
     def normalized(self):
         try:
             magnitude = self.magnitude()
-            return self.times_scalar(Decimal('1.0')/magnitude)
+            return self.times_scalar(1.0/magnitude)
         except ZeroDivisionError:
-            raise Exception('Cannot normalize zero vector')
+            raise Exception(self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG)
