@@ -10,9 +10,9 @@ class Line(object):
     NO_NONZERO_ELTS_FOUND_MSG = 'No nonzero elements found'
 
     def is_parallel_to(self, line2):
-        v1 = Vector(self.normal_vector)
+        v1 = self.normal_vector
         print 'v1: ', v1
-        v2 = Vector(line2.normal_vector)
+        v2 = line2.normal_vector
         print 'v2: ', v2
         return v1.is_parallel_to(v2)
 
