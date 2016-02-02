@@ -9,31 +9,61 @@ class Line(object):
 
     NO_NONZERO_ELTS_FOUND_MSG = 'No nonzero elements found'
 
+    def intersection_with(self, line2):
+        try:
+            A, B = self.normal_vector.coordinates
+            C, D = line2.normal_vector.coordinates
+            k1 = self.constant_term
+            k2 = line2.constant_term
+
+            x_numerator = D*k1 - B*k2
+            y_numerator = -C*k1 + A*k2
+            one_over_denom = Decimal('1.0')/(A*D - B*C)
+
+            return Vector([x_numerator, y_numerator]).times_scalar(one_over_denom)
+        
+        except ZeroDivisionError:
+            if self == line2:
+                return self
+        else:
+            return None
+        
     def is_parallel_to(self, line2):
         v1 = self.normal_vector
-        print 'v1: ', v1
         v2 = line2.normal_vector
-        print 'v2: ', v2
         return v1.is_parallel_to(v2)
 
-    def is_equal_to(self, line2):
+    def __eq__(self, line2):
         ''' self and l2 are equal iff
             vector connect to self.base and line2.base [base1 - base2]
             vc is ortho to normal of self and normal of line2
         '''
-        vcc = [x1-x2 for x1, x2 in zip(self, line2) ] 
-        vc = Vector(vcc)
-        if vc.is_orthogonal_to(self.normal_vector) and vc.is_orthogonal_to(line2.normal_vector):
-            return True
-        else:
+
+        # if self.normal_vector().is_near_zero():
+        #     if not line2.normal_vector.is_near_zero():
+        #         return False
+        #     else:
+        #         diff = self.constant_term -line2.constant_term
+        #         return MyDecimal(diff).is_near_zero()
+        # elif line2.normal_vector().is_near_zero():
+        #     return False
+
+        if not self.is_parallel_to(line2):
             return False
 
+        x0 = self.basepoint
+        x1 = line2.basepoint
+        basepoint_diff = x0.minus(x1)
+
+        n = self.normal_vector
+        return basepoint_diff.is_orthogonal_to(n)
+
     def intersects(self, line2):
-        parallel = self.is_parallel_to(self, line2)
+        parallel = self.is_parallel_to(line2)
         if parallel :
             return False
         else:
-            if self.is_equal_to(self, line2):
+            if self == line2:
                 return False
             else:
                 return True

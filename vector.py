@@ -13,7 +13,7 @@ class Vector(object):
         try:
             if not coordinates:
                 raise ValueError
-            print "coordinates: ", coordinates
+            #print "coordinates: ", coordinates
             self.coordinates = tuple([Decimal(x) for x in coordinates])
             self.dimension = len(coordinates)
 
